@@ -8,15 +8,16 @@ $accent-deep: color.adjust($accent, $lightness: -12%);
 $accent-soft: color.mix($accent, #ffffff, 14%);
 
 // Superficies
-$paper: #fdfcfa; // fondo base
+$paper: #fffafc; // fondo base, blanco con un toque rosa
 $surface: #ffffff; // superficies elevadas
-$sand: #f1ece6; // bloques suaves
-$line: #e7e1d9; // bordes
+$sand: #fdeef5; // bloques suaves (rosa empolvado)
+$blush: #fbd9e8; // rosa de apoyo para cintas y chips
+$line: #f1dde7; // bordes
 
 // Texto
-$ink: #191423; // texto principal
-$ink-soft: #4a4552; // texto secundario
-$ink-muted: #8a8590; // terciario / labels
+$ink: #24111c; // texto principal
+$ink-soft: #5c4654; // texto secundario
+$ink-muted: #9a8491; // terciario / labels
 
 $overlay: rgba(#100c14, 0.55);
 
