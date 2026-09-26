@@ -32,6 +32,23 @@ export const useUserStore = defineStore('user', {
       return user
     },
 
+    async register(payload: {
+      name: string
+      email: string
+      password: string
+      phone: string
+    }): Promise<SessionUser> {
+      const { token, user } = await authService.register(payload)
+      this.setSession(token, user)
+      return user
+    },
+
+    async updateProfile(payload: { name: string; phone: string }): Promise<SessionUser> {
+      const user = await authService.updateProfile(payload)
+      this.user = user
+      return user
+    },
+
     /** Recupera la sesión desde el token guardado, verificándola con el API. */
     async restore(): Promise<SessionUser | null> {
       if (this.user) return this.user
