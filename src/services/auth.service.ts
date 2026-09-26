@@ -10,8 +10,23 @@ class AuthService extends APIBase {
     return data
   }
 
+  async register(payload: {
+    name: string
+    email: string
+    password: string
+    phone: string
+  }): Promise<{ token: string; user: SessionUser }> {
+    const { data } = await this.post<{ token: string; user: SessionUser }>('auth/register', payload)
+    return data
+  }
+
   async me(): Promise<SessionUser> {
     const { data } = await this.get<{ user: SessionUser }>('auth/me')
+    return data.user
+  }
+
+  async updateProfile(payload: { name: string; phone: string }): Promise<SessionUser> {
+    const { data } = await this.put<{ user: SessionUser }>('auth/profile', payload)
     return data.user
   }
 
