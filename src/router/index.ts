@@ -163,6 +163,9 @@ router.beforeEach(async (to) => {
   }
 
   if (to.meta.guestOnly && userStore.isAuthenticated) {
+    // Solo rutas internas: un ?next= externo sería una redirección abierta.
+    const next = typeof to.query.next === 'string' ? to.query.next : ''
+    if (next.startsWith('/') && !next.startsWith('//')) return { path: next, replace: true }
     return { name: userStore.isAdmin ? 'AdminDashboard' : 'Account', replace: true }
   }
 })
