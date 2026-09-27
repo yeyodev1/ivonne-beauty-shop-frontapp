@@ -1,10 +1,13 @@
 import { ref } from 'vue'
 import { catalogService } from '@/services/catalog.service'
+import { site } from '@/config/site'
 import type { Settings } from '@/types'
 
 // Estado de módulo: la barra de anuncio, la ficha de producto y el checkout
 // leen lo mismo y solo se pide una vez por carga.
-const settings = ref<Settings>({ shippingOptions: [], announcement: '' })
+// El anuncio arranca con el copy de marca: si esperara al API, la barra
+// aparecería tarde y empujaría el header hacia abajo.
+const settings = ref<Settings>({ shippingOptions: [], announcement: site.announcement })
 const loaded = ref(false)
 let pending: Promise<void> | null = null
 
