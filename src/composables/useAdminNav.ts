@@ -30,6 +30,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
 
 export const ADMIN_NAV_MORE: AdminNavItem[] = [
   { label: 'Clientes', icon: 'fa-solid fa-user-group', to: { name: 'AdminCustomers' }, match: ['AdminCustomers'] },
+  { label: 'Usuarios', icon: 'fa-solid fa-user-shield', to: { name: 'AdminUsers' }, match: ['AdminUsers'] },
   { label: 'Ajustes', icon: 'fa-solid fa-sliders', to: { name: 'AdminSettings' }, match: ['AdminSettings'] },
 ]
 

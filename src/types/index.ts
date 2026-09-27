@@ -167,6 +167,19 @@ export interface AdminCustomer {
   totalSpent: number
 }
 
+export type AccountType = 'customer' | 'admin'
+
+export interface AdminUser {
+  id: string
+  name: string
+  email: string
+  phone: string
+  accountType: AccountType
+  isActive: boolean
+  lastLoginAt: string | null
+  createdAt: string
+}
+
 /** Línea del carrito: copia mínima del producto para pintar sin pedir al API. */
 export interface CartItem {
   productId: string

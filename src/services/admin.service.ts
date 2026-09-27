@@ -1,6 +1,8 @@
 import APIBase from './httpBase'
 import type {
+  AccountType,
   AdminCustomer,
+  AdminUser,
   AdminStats,
   Category,
   Order,
@@ -31,6 +33,21 @@ export interface AdminOrderQuery {
 export interface AdminCustomerQuery {
   q?: string
   page?: number
+}
+
+export interface AdminUserQuery {
+  q?: string
+  accountType?: AccountType | ''
+  page?: number
+}
+
+export interface UserPayload {
+  name: string
+  email?: string
+  phone: string
+  accountType: AccountType
+  isActive?: boolean
+  password?: string
 }
 
 export interface ProductPayload {
@@ -178,6 +195,23 @@ class AdminService extends APIBase {
 
   async listCustomers(query: AdminCustomerQuery = {}): Promise<Paginated<AdminCustomer>> {
     const { data } = await this.get<Paginated<AdminCustomer>>(`admin/customers${toQuery(query)}`)
+    return data
+  }
+
+  // Usuarios
+
+  async listUsers(query: AdminUserQuery = {}): Promise<Paginated<AdminUser>> {
+    const { data } = await this.get<Paginated<AdminUser>>(`admin/users${toQuery(query)}`)
+    return data
+  }
+
+  async createUser(payload: UserPayload): Promise<AdminUser> {
+    const { data } = await this.post<AdminUser>('admin/users', payload)
+    return data
+  }
+
+  async updateUser(id: string, payload: Partial<UserPayload>): Promise<AdminUser> {
+    const { data } = await this.patch<AdminUser>(`admin/users/${id}`, payload)
     return data
   }
 
