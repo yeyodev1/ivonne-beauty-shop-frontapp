@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, reactive } from 'vue'
 import { site, whatsappLink } from '@/config/site'
 import { productCover } from '@/utils/format'
 import type { Product } from '@/types'
@@ -19,13 +19,29 @@ const title = computed(() => {
   }
 })
 
-// Tres "espejos de tocador" con productos reales; sin productos, el placeholder de marca.
+// Tres "espejos de tocador" con productos reales. Mientras llegan los
+// productos se reservan los tres arcos vacíos: si se pintara uno y luego tres,
+// el hero saltaría.
 const mirrors = computed(() => {
   const withImages = props.products.filter((p) => p.images?.length).slice(0, 3)
-  return withImages.length
-    ? withImages.map((p) => ({ src: productCover(p.images), alt: p.name, to: `/producto/${p.slug}` }))
-    : [{ src: '/placeholder-product.svg', alt: site.name, to: '/tienda' }]
+  return [0, 1, 2].map((i) => {
+    const p = withImages[i]
+    return p
+      ? { src: productCover(p.images), alt: p.name, to: `/producto/${p.slug}` }
+      : { src: '', alt: '', to: '/tienda' }
+  })
 })
+
+// Cada foto entra con fundido cuando termina de cargar, no de golpe.
+const loaded = reactive<Record<string, boolean>>({})
+function onImage(event: Event) {
+  const img = event.target as HTMLImageElement
+  loaded[img.currentSrc || img.src] = true
+}
+function markIfCached(el: unknown) {
+  const img = el as HTMLImageElement | null
+  if (img?.complete && img.naturalWidth) loaded[img.currentSrc || img.src] = true
+}
 </script>
 
 <template>
@@ -49,15 +65,23 @@ const mirrors = computed(() => {
         </div>
       </div>
 
-      <div class="hero__mirrors" :class="`hero__mirrors--${mirrors.length}`">
+      <div class="hero__mirrors">
         <RouterLink
           v-for="(mirror, i) in mirrors"
-          :key="mirror.src + i"
+          :key="i"
           :to="mirror.to"
           class="hero__mirror"
           :class="`hero__mirror--${i + 1}`"
         >
-          <img :src="mirror.src" :alt="mirror.alt" :loading="i === 0 ? 'eager' : 'lazy'" />
+          <img
+            v-if="mirror.src"
+            :ref="markIfCached"
+            :src="mirror.src"
+            :alt="mirror.alt"
+            :class="{ 'is-loaded': loaded[mirror.src] }"
+            fetchpriority="high"
+            @load="onImage"
+          />
         </RouterLink>
       </div>
     </div>
@@ -167,6 +191,16 @@ const mirrors = computed(() => {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      opacity: 0;
+      transform: scale(1.04);
+      transition:
+        opacity 0.7s $ease,
+        transform 1.2s $ease;
+
+      &.is-loaded {
+        opacity: 1;
+        transform: none;
+      }
     }
 
     &:hover {
@@ -184,10 +218,6 @@ const mirrors = computed(() => {
     @include reduced-motion {
       transition: none;
     }
-  }
-
-  &__mirrors--1 &__mirror {
-    max-width: 260px;
   }
 }
 </style>
