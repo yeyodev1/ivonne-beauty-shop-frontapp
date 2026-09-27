@@ -21,4 +21,10 @@ window.addEventListener('auth:token-expired', () => {
   }
 })
 
-app.mount('#app')
+// Se monta cuando la vista inicial (que llega en su propio chunk) ya está
+// resuelta: si no, se vería el header con el footer pegado debajo y la página
+// aparecería de golpe un instante después. index.html hace el fundido.
+router.isReady().finally(() => {
+  app.mount('#app')
+  window.dispatchEvent(new Event('app:mounted'))
+})
