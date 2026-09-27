@@ -6,6 +6,9 @@ export const site = {
   name: 'Ivonne Beauty Shop',
   shortName: 'Ivonne',
   tagline: 'Maquillaje y skincare 100% original',
+  // Anuncio inicial de la barra superior; el panel lo puede cambiar y el API
+  // lo reemplaza al cargar. Existe para que la barra no aparezca tarde.
+  announcement: 'Maquillaje y skincare 100% original de USA · Envíos a todo Ecuador',
   description:
     'Maquillaje, skincare, perfumes y bolsos originales traídos de USA. Tienda en Machala con envíos a todo Ecuador.',
   url: 'https://dev-project-front.bakano.ec',
