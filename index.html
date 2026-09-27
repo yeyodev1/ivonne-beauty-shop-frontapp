@@ -28,30 +28,39 @@
     />
 
     <!--
-      Entrada suave: sin esto el logo y los titulares se pintan primero en
-      Georgia y saltan a Playfair cuando llega la fuente. La página espera a
-      las fuentes de marca (máximo 1,8 s, para no castigar redes lentas) y
-      aparece con un fundido. El fondo rosado va inline para que no haya
-      destello blanco mientras carga el CSS de la app.
+      Entrada suave: la página se muestra de una sola vez, con fundido, cuando
+      ya están las fuentes de marca (si no, el logo salta de Georgia a
+      Playfair) y la vista inicial montada (si no, se ve el header con el
+      footer pegado). Tope de 2,5 s para no castigar redes lentas. El fondo
+      rosado va inline para que no haya destello blanco mientras tanto.
     -->
     <style>
       html { background: #fffafc; }
-      html.fonts-pending #app { opacity: 0; }
+      html.app-pending #app { opacity: 0; }
       #app { opacity: 1; transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
       @media (prefers-reduced-motion: reduce) { #app { transition: none; } }
     </style>
     <script>
       ;(function () {
         var root = document.documentElement
-        if (!document.fonts || !document.fonts.load) return
-        root.classList.add('fonts-pending')
-        var reveal = function () { root.classList.remove('fonts-pending') }
-        Promise.all([
-          document.fonts.load('600 1em "Playfair Display"'),
-          document.fonts.load('italic 500 1em "Playfair Display"'),
-          document.fonts.load('500 1em "Montserrat"'),
-        ]).then(reveal, reveal)
-        setTimeout(reveal, 1800)
+        root.classList.add('app-pending')
+        var reveal = function () { root.classList.remove('app-pending') }
+        var mounted = new Promise(function (resolve) {
+          window.addEventListener('app:mounted', resolve, { once: true })
+        })
+        var fonts = document.fonts && document.fonts.load
+          ? Promise.all([
+              document.fonts.load('600 1em "Playfair Display"'),
+              document.fonts.load('italic 500 1em "Playfair Display"'),
+              document.fonts.load('500 1em "Montserrat"'),
+            ])
+          : Promise.resolve()
+        // Un frame extra tras montar: el navegador pinta con opacidad 0 y el
+        // fundido sí se ve.
+        Promise.all([fonts.catch(function () {}), mounted]).then(function () {
+          requestAnimationFrame(function () { requestAnimationFrame(reveal) })
+        })
+        setTimeout(reveal, 2500)
       })()
     </script>
 
