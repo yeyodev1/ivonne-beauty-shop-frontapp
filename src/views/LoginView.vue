@@ -45,9 +45,9 @@ async function submit() {
 
 <template>
   <AuthCard
-    eyebrow="Mi cuenta"
-    title="Hola bella, qué bueno verte"
-    subtitle="Ingresa para ver tus pedidos y comprar más rápido."
+    eyebrow="Equipo Ivonne"
+    title="Ingreso al panel"
+    subtitle="Acceso para administrar productos, pedidos y usuarios."
     :error="error"
     @submit="submit"
   >
@@ -83,8 +83,8 @@ async function submit() {
     </template>
 
     <template #footer>
-      ¿Primera vez por aquí?
-      <RouterLink :to="{ path: '/registro', query: next ? { next } : {} }">Crea tu cuenta</RouterLink>
+      ¿Compraste en la tienda?
+      <RouterLink to="/mi-pedido">Consulta tu pedido sin cuenta</RouterLink>
     </template>
   </AuthCard>
 </template>

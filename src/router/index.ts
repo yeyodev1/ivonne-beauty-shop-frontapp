@@ -40,16 +40,28 @@ const routes: Array<RouteRecordRaw> = [
     meta: { title: 'Estado de tu pago' },
   },
   {
+    // URL de respuesta configurada en el panel de Payphone.
+    path: '/pay-response',
+    name: 'PayResponse',
+    component: () => import('@/views/PaymentResponseView.vue'),
+    meta: { title: 'Estado de tu pago' },
+  },
+  {
+    path: '/mi-pedido',
+    name: 'TrackOrder',
+    component: () => import('@/views/TrackOrderView.vue'),
+    meta: { title: 'Consultar mi pedido' },
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/LoginView.vue'),
     meta: { title: 'Ingresar', guestOnly: true },
   },
   {
+    // La tienda vende sin cuentas: el registro público ya no existe.
     path: '/registro',
-    name: 'Register',
-    component: () => import('@/views/RegisterView.vue'),
-    meta: { title: 'Crear cuenta', guestOnly: true },
+    redirect: '/mi-pedido',
   },
   {
     path: '/cuenta',
@@ -115,6 +127,12 @@ const routes: Array<RouteRecordRaw> = [
         name: 'AdminCustomers',
         component: () => import('@/views/admin/AdminCustomersView.vue'),
         meta: { title: 'Clientes' },
+      },
+      {
+        path: 'usuarios',
+        name: 'AdminUsers',
+        component: () => import('@/views/admin/AdminUsersView.vue'),
+        meta: { title: 'Usuarios' },
       },
       {
         path: 'ajustes',

@@ -18,11 +18,10 @@ const describedBy = (id: string) => (errors[id as keyof typeof errors] ? `${id}-
 <template>
   <CheckoutStep :step="1" title="Tus datos" subtitle="Los pide Payphone para procesar tu pago de forma segura.">
     <p v-if="!userStore.isAuthenticated" class="customer__login">
-      <i class="fa-regular fa-user" aria-hidden="true"></i>
+      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
       <span>
-        Puedes comprar como invitada.
-        <RouterLink :to="{ path: '/login', query: { next: '/checkout' } }">Inicia sesión</RouterLink>
-        para ver tus pedidos luego.
+        No necesitas crear cuenta. Con tu correo y el número de pedido puedes
+        <RouterLink to="/mi-pedido">consultar tu compra</RouterLink> cuando quieras.
       </span>
     </p>
 

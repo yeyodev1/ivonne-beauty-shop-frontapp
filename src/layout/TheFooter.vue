@@ -12,10 +12,7 @@ const accountLinks = computed(() =>
         { label: 'Mi cuenta', to: '/cuenta' },
         { label: 'Mis pedidos', to: '/cuenta/pedidos' },
       ]
-    : [
-        { label: 'Ingresar', to: '/login' },
-        { label: 'Crear cuenta', to: '/registro' },
-      ],
+    : [{ label: 'Consultar mi pedido', to: '/mi-pedido' }],
 )
 </script>
 

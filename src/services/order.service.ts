@@ -28,6 +28,12 @@ class OrderService extends APIBase {
     return data
   }
 
+  /** Consulta de invitada: sin cuenta, con el correo y el número del pedido. */
+  async lookup(email: string, number: string): Promise<{ order: Order }> {
+    const { data } = await this.post<{ order: Order }>('orders/lookup', { email, number })
+    return data
+  }
+
   async byTransaction(clientTransactionId: string): Promise<{ order: Order }> {
     const { data } = await this.get<{ order: Order }>(
       `orders/by-transaction/${encodeURIComponent(clientTransactionId)}`,

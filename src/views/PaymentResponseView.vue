@@ -11,7 +11,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { orderService } from '@/services/order.service'
 import { useCartStore } from '@/stores/cart'
-import { useUserStore } from '@/stores/user'
 import { whatsappLink } from '@/config/site'
 import PaymentStatus from '@/components/checkout/PaymentStatus.vue'
 import PaymentOrderSummary from '@/components/checkout/PaymentOrderSummary.vue'
@@ -21,7 +20,6 @@ type State = 'confirming' | 'approved' | 'canceled' | 'error'
 
 const route = useRoute()
 const cart = useCartStore()
-const userStore = useUserStore()
 
 const state = ref<State>('confirming')
 const order = ref<Order | null>(null)
@@ -92,12 +90,19 @@ onMounted(confirm)
       />
 
       <div v-else-if="state === 'approved' && order" key="approved" class="response__approved">
-        <PaymentStatus tone="success" :title="`¡Gracias, bella! Tu pedido ${order.number} está confirmado`">
+        <PaymentStatus
+          tone="success"
+          :title="`¡Gracias, bella! Tu pedido ${order.number} está confirmado`"
+          :text="`Guarda tu número de pedido ${order.number}: con él y tu correo puedes consultar tu compra cuando quieras.`"
+        >
           <a class="btn btn--primary" :href="waDelivery" target="_blank" rel="noopener">
             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Coordinar mi entrega
           </a>
-          <RouterLink v-if="userStore.isAuthenticated" to="/cuenta/pedidos" class="btn btn--ghost">
-            Ver mis pedidos
+          <RouterLink
+            :to="{ name: 'TrackOrder', query: { email: order.customer.email, numero: order.number } }"
+            class="btn btn--ghost"
+          >
+            Consultar mi pedido
           </RouterLink>
           <RouterLink to="/tienda" class="response__link">Seguir comprando</RouterLink>
         </PaymentStatus>

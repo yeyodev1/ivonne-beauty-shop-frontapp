@@ -29,7 +29,7 @@ watch(
 const account = computed(() => {
   if (userStore.isAdmin) return { to: '/admin', label: 'Panel de administración' }
   if (userStore.isAuthenticated) return { to: '/cuenta', label: 'Mi cuenta' }
-  return { to: '/login', label: 'Ingresar' }
+  return { to: '/mi-pedido', label: 'Consultar mi pedido' }
 })
 
 function search() {
@@ -86,7 +86,7 @@ function search() {
 
       <div class="header__actions">
         <RouterLink :to="account.to" class="header__icon" :aria-label="account.label">
-          <i :class="userStore.isAdmin ? 'fa-solid fa-gauge' : 'fa-regular fa-user'"></i>
+          <i :class="userStore.isAdmin ? 'fa-solid fa-gauge' : userStore.isAuthenticated ? 'fa-regular fa-user' : 'fa-solid fa-box-open'"></i>
         </RouterLink>
         <button
           type="button"
