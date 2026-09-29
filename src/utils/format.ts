@@ -17,7 +17,9 @@ export function centsToInput(cents: number | null | undefined): string {
 
 /** "19,90" o "19.90" → 1990. Vacío o inválido → null. */
 export function inputToCents(value: string | number): number | null {
-  const text = String(value ?? '').trim().replace(',', '.')
+  const text = String(value ?? '')
+    .trim()
+    .replace(',', '.')
   if (!text) return null
   const number = Number(text)
   return Number.isFinite(number) ? Math.round(number * 100) : null
@@ -56,4 +58,9 @@ export const ORDER_STATUS_LABELS: Record<string, string> = {
 /** Primera imagen del producto o un placeholder de marca. */
 export function productCover(images: Array<{ url: string }> | undefined): string {
   return images?.[0]?.url || '/placeholder-product.svg'
+}
+
+/** Una línea del carrito es producto + tono: el mismo labial en dos tonos son dos líneas. */
+export function cartKey(productId: string, shadeId = ''): string {
+  return shadeId ? `${productId}:${shadeId}` : productId
 }

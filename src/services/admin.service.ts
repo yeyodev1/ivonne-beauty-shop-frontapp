@@ -10,6 +10,7 @@ import type {
   Paginated,
   Product,
   ProductImage,
+  ProductShade,
   Settings,
 } from '@/types'
 
@@ -61,6 +62,7 @@ export interface ProductPayload {
   isPublished: boolean
   isFeatured: boolean
   tags: string[]
+  shades: ProductShade[]
   images?: ProductImage[]
 }
 

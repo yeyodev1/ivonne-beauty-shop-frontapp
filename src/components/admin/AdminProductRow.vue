@@ -7,6 +7,13 @@ import type { Product } from '@/types'
 const props = defineProps<{ product: Product; busy?: boolean }>()
 const emit = defineEmits<{ togglePublish: []; toggleFeatured: [] }>()
 
+const shadesLabel = computed(() => {
+  const shades = props.product.shades || []
+  if (!shades.length) return ''
+  const off = shades.filter((s) => !s.isActive || s.stock <= 0).length
+  return `${shades.length} tonos${off ? ` · ${off} sin venta` : ''}`
+})
+
 const stockTone = computed(() => {
   if (props.product.stock <= 0) return 'danger'
   if (props.product.stock <= 3) return 'warning'
@@ -30,6 +37,7 @@ const stockTone = computed(() => {
           <AdminChip :tone="stockTone">
             {{ product.stock > 0 ? `${product.stock} en stock` : 'Agotado' }}
           </AdminChip>
+          <AdminChip v-if="shadesLabel" tone="neutral">{{ shadesLabel }}</AdminChip>
           <AdminChip :tone="product.isPublished ? 'success' : 'neutral'">
             {{ product.isPublished ? 'Publicado' : 'Borrador' }}
           </AdminChip>

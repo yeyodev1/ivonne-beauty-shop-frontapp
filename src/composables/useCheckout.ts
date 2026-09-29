@@ -66,14 +66,25 @@ function saveBuyer() {
     const { name, email, phone, documentId, city, street, reference } = form
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ name, email, phone, documentId, city, street, reference, shippingId: shippingId.value }),
+      JSON.stringify({
+        name,
+        email,
+        phone,
+        documentId,
+        city,
+        street,
+        reference,
+        shippingId: shippingId.value,
+      }),
     )
   } catch {
     // Modo privado: la próxima vez tocará escribirlos de nuevo.
   }
 }
 
-const selectedOption = computed(() => shippingOptions.value.find((o) => o.id === shippingId.value) || null)
+const selectedOption = computed(
+  () => shippingOptions.value.find((o) => o.id === shippingId.value) || null,
+)
 const isPickup = computed(() => shippingId.value === PICKUP_ID)
 
 watch(shippingId, (id, previous) => {
@@ -166,7 +177,11 @@ export function useCheckout() {
     submitting.value = true
     try {
       const result = await orderService.createOrder({
-        items: cart.items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+        items: cart.items.map((item) => ({
+          productId: item.productId,
+          shadeId: item.shadeId || undefined,
+          quantity: item.quantity,
+        })),
         customer: {
           name: form.name.trim(),
           email: form.email.trim().toLowerCase(),
@@ -176,7 +191,11 @@ export function useCheckout() {
         shippingOptionId: shippingId.value,
         address: isPickup.value
           ? { city: 'Machala', street: '', reference: '' }
-          : { city: form.city.trim(), street: form.street.trim(), reference: form.reference.trim() },
+          : {
+              city: form.city.trim(),
+              street: form.street.trim(),
+              reference: form.reference.trim(),
+            },
         notes: form.notes.trim() || undefined,
       })
       order.value = result.order
@@ -214,7 +233,10 @@ export function useCheckout() {
 
   /** Mensaje para quien prefiere pagar por transferencia o en tienda. */
   const whatsappMessage = computed(() => {
-    const lines = cart.items.map((i) => `• ${i.quantity} x ${i.name} (${formatMoney(i.price * i.quantity)})`)
+    const lines = cart.items.map(
+      (i) =>
+        `• ${i.quantity} x ${i.name}${i.shadeName ? ` · Tono ${i.shadeName}` : ''} (${formatMoney(i.price * i.quantity)})`,
+    )
     const delivery = selectedOption.value
       ? `Entrega: ${selectedOption.value.label}${isPickup.value ? '' : ` — ${form.street.trim()}, ${form.city.trim()}`}`
       : ''

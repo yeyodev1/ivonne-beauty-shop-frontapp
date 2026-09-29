@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useCartStore } from '@/stores/cart'
+import { itemKey, useCartStore } from '@/stores/cart'
 import { useBodyScroll } from '@/composables/useBodyScroll'
 import CartLine from './CartLine.vue'
 import CartSummary from './CartSummary.vue'
@@ -53,7 +53,7 @@ const countLabel = computed(() => (cart.count === 1 ? '1 producto' : `${cart.cou
           <ul class="drawer__lines">
             <CartLine
               v-for="item in cart.items"
-              :key="item.productId"
+              :key="itemKey(item)"
               :item="item"
               @navigate="cart.closeDrawer()"
             />

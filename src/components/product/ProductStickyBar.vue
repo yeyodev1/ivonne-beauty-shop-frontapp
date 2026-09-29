@@ -1,25 +1,42 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { site } from '@/config/site'
 import { formatMoney } from '@/utils/format'
 import { useProductCart } from '@/composables/useProductCart'
-import type { Product } from '@/types'
+import type { Product, ProductShade } from '@/types'
 
-defineProps<{ product: Product }>()
+const props = defineProps<{ product: Product; shade: ProductShade | null }>()
 const { addToBag } = useProductCart()
+
+const needsShade = computed(() => props.product.shades?.length > 0 && !props.shade)
+const stock = computed(() => (props.shade ? props.shade.stock : props.product.stock))
+
+function add() {
+  // En móvil el selector puede estar fuera de vista: se lleva ahí en vez de mostrar un error.
+  if (needsShade.value) {
+    document.getElementById('tonos')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    return
+  }
+  addToBag(props.product, 1, true, props.shade)
+}
 </script>
 
 <template>
   <div class="sticky">
     <div class="sticky__info">
-      <span class="sticky__name">{{ product.name }}</span>
+      <span class="sticky__name">
+        {{ product.name }}<template v-if="shade"> · {{ shade.name }}</template>
+      </span>
       <strong class="sticky__price">{{ formatMoney(product.price) }}</strong>
     </div>
     <button
       type="button"
       class="btn btn--primary sticky__btn"
-      :disabled="product.stock <= 0"
-      @click="addToBag(product)"
+      :disabled="stock <= 0"
+      @click="add"
     >
-      <template v-if="product.stock > 0"><i class="fa-solid fa-bag-shopping"></i> Agregar</template>
+      <template v-if="needsShade && stock > 0">{{ site.shades.choose }}</template>
+      <template v-else-if="stock > 0"><i class="fa-solid fa-bag-shopping"></i> Agregar</template>
       <template v-else>Agotado</template>
     </button>
   </div>

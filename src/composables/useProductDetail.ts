@@ -3,7 +3,7 @@ import { useRoute } from 'vue-router'
 import { catalogService } from '@/services/catalog.service'
 import { useToastStore } from '@/stores/toast'
 import { site } from '@/config/site'
-import type { ApiError, Category, Product } from '@/types'
+import type { ApiError, Category, Product, ProductShade } from '@/types'
 
 export function useProductDetail() {
   const route = useRoute()
@@ -13,6 +13,12 @@ export function useProductDetail() {
   const related = ref<Product[]>([])
   const loading = ref(true)
   const notFound = ref(false)
+  // Lo comparten la caja de compra y la barra fija de móvil
+  const shadeId = ref('')
+
+  const shade = computed<ProductShade | null>(
+    () => product.value?.shades?.find((s) => s._id === shadeId.value) || null,
+  )
 
   const category = computed<Category | null>(() => {
     const c = product.value?.category
@@ -32,6 +38,10 @@ export function useProductDetail() {
       const data = await catalogService.getProduct(slug)
       product.value = data.product
       related.value = data.related || []
+      // ?tono= viene del carrito: al volver a la ficha el tono sigue elegido
+      const wanted = String(route.query.tono || '')
+      const match = data.product.shades?.find((s) => s._id === wanted && s.isActive && s.stock > 0)
+      shadeId.value = match?._id || ''
       document.title = `${data.product.name} — ${site.name}`
     } catch (e) {
       product.value = null
@@ -54,5 +64,5 @@ export function useProductDetail() {
     { immediate: true },
   )
 
-  return { product, related, loading, notFound, category, discount }
+  return { product, related, loading, notFound, category, discount, shadeId, shade }
 }

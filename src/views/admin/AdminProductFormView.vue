@@ -4,6 +4,7 @@ import BaseModal from '@/components/ui/BaseModal.vue'
 import AdminFormSection from '@/components/admin/AdminFormSection.vue'
 import AdminSwitch from '@/components/admin/AdminSwitch.vue'
 import AdminStockStepper from '@/components/admin/AdminStockStepper.vue'
+import AdminShadesEditor from '@/components/admin/AdminShadesEditor.vue'
 import AdminTagsInput from '@/components/admin/AdminTagsInput.vue'
 import AdminProductImages from '@/components/admin/AdminProductImages.vue'
 import AdminSkeleton from '@/components/admin/AdminSkeleton.vue'
@@ -74,7 +75,17 @@ async function confirmDelete() {
             <small class="pform__help">Se muestra tachado si es mayor al precio.</small>
           </div>
         </div>
-        <AdminStockStepper id="p-stock" v-model="form.stock" label="Unidades en stock" />
+        <AdminStockStepper v-if="!form.shades.length" id="p-stock" v-model="form.stock" label="Unidades en stock" />
+        <p v-else class="pform__help">Este producto tiene tonos: el stock se maneja en cada tono.</p>
+      </AdminFormSection>
+
+      <AdminFormSection
+        title="Tonos"
+        icon="fa-solid fa-palette"
+        hint="Para bases, labiales, rubores… Apaga “A la venta” en el tono que ya no tengas y los demás siguen disponibles."
+      >
+        <AdminShadesEditor v-model="form.shades" />
+        <small v-if="errors.shades" class="pform__error">{{ errors.shades }}</small>
       </AdminFormSection>
 
       <AdminFormSection title="Visibilidad" icon="fa-solid fa-eye">

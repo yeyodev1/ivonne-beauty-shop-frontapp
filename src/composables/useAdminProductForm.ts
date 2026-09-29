@@ -4,7 +4,7 @@ import { adminService, type ProductPayload } from '@/services/admin.service'
 import { useAdminCategories } from './useAdminCategories'
 import { useToastStore } from '@/stores/toast'
 import { centsToInput, inputToCents } from '@/utils/format'
-import type { ApiError, Product, ProductImage } from '@/types'
+import type { ApiError, Product, ProductImage, ProductShade } from '@/types'
 
 function emptyForm() {
   return {
@@ -18,6 +18,7 @@ function emptyForm() {
     isPublished: true,
     isFeatured: false,
     tags: [] as string[],
+    shades: [] as ProductShade[],
   }
 }
 
@@ -37,13 +38,14 @@ export function useAdminProductForm() {
   const loading = ref(isEdit.value)
   const saving = ref(false)
   const deleting = ref(false)
-  const errors = reactive({ name: '', price: '' })
+  const errors = reactive({ name: '', price: '', shades: '' })
 
   function fill(product: Product) {
     Object.assign(form, {
       name: product.name,
       brand: product.brand,
-      category: typeof product.category === 'string' ? product.category : product.category?._id || '',
+      category:
+        typeof product.category === 'string' ? product.category : product.category?._id || '',
       description: product.description,
       price: centsToInput(product.price),
       compareAtPrice: centsToInput(product.compareAtPrice),
@@ -51,6 +53,8 @@ export function useAdminProductForm() {
       isPublished: product.isPublished,
       isFeatured: product.isFeatured,
       tags: [...(product.tags || [])],
+      // Copia: editar un tono no debe tocar el producto cargado hasta guardar
+      shades: (product.shades || []).map((s) => ({ ...s })),
     })
     images.value = product.images || []
   }
@@ -87,7 +91,15 @@ export function useAdminProductForm() {
     errors.name = form.name.trim() ? '' : 'Ponle un nombre al producto'
     const price = inputToCents(form.price)
     errors.price = price !== null && price > 0 ? '' : 'Escribe un precio válido, por ejemplo 19.90'
-    return !errors.name && !errors.price
+    errors.shades = shadesError()
+    return !errors.name && !errors.price && !errors.shades
+  }
+
+  function shadesError(): string {
+    const names = form.shades.map((s) => s.name.trim().toLowerCase())
+    if (names.some((n) => !n)) return 'Hay un tono sin nombre'
+    const repeated = names.find((n, i) => names.indexOf(n) !== i)
+    return repeated ? `El tono "${repeated}" está repetido` : ''
   }
 
   function payload(): ProductPayload {
@@ -105,6 +117,7 @@ export function useAdminProductForm() {
       isPublished: form.isPublished,
       isFeatured: form.isFeatured,
       tags: form.tags,
+      shades: form.shades.map((s) => ({ ...s, name: s.name.trim() })),
     }
   }
 
@@ -121,7 +134,11 @@ export function useAdminProductForm() {
       } else {
         const created = await adminService.createProduct(payload())
         toast.success('Producto creado. Ahora súbele fotos')
-        router.replace({ name: 'AdminProductEdit', params: { id: created._id }, query: { fotos: '1' } })
+        router.replace({
+          name: 'AdminProductEdit',
+          params: { id: created._id },
+          query: { fotos: '1' },
+        })
       }
     } catch (e) {
       toast.error((e as ApiError).message)

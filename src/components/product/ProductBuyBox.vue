@@ -5,42 +5,57 @@ import { site, whatsappLink } from '@/config/site'
 import { formatMoney } from '@/utils/format'
 import { useProductCart } from '@/composables/useProductCart'
 import QuantityStepper from '@/components/cart/QuantityStepper.vue'
-import type { Product } from '@/types'
+import ProductShadePicker from './ProductShadePicker.vue'
+import type { Product, ProductShade } from '@/types'
 
-const props = defineProps<{ product: Product; discount: number }>()
+const props = defineProps<{ product: Product; discount: number; shade: ProductShade | null }>()
+const shadeId = defineModel<string>('shadeId', { required: true })
 
 const router = useRouter()
 const { addToBag, inCart } = useProductCart()
 
 const quantity = ref(1)
 watch(
-  () => props.product._id,
+  () => [props.product._id, shadeId.value],
   () => (quantity.value = 1),
 )
 
-const soldOut = computed(() => props.product.stock <= 0)
-const max = computed(() => Math.max(1, Math.min(props.product.stock, 20)))
+const hasShades = computed(() => props.product.shades?.length > 0)
+// Con tonos, el stock que manda es el del tono elegido; sin elegir, el total del producto.
+const stock = computed(() => (props.shade ? props.shade.stock : props.product.stock))
+const soldOut = computed(() => stock.value <= 0)
+const needsShade = computed(() => hasShades.value && !props.shade)
+const max = computed(() => Math.max(1, Math.min(stock.value, 20)))
 const stockLabel = computed(() => {
-  const { stock } = props.product
-  if (stock <= 0) return 'Agotado'
-  if (stock <= 3) return stock === 1 ? 'Última unidad' : `Últimas ${stock} unidades`
+  if (stock.value <= 0) return props.shade ? `Tono ${props.shade.name} agotado` : 'Agotado'
+  if (needsShade.value) return 'Disponible en varios tonos'
+  if (stock.value <= 3) return stock.value === 1 ? 'Última unidad' : `Últimas ${stock.value} unidades`
   return 'Disponible'
 })
 
-const whatsappHref = computed(() =>
-  whatsappLink(
-    `Hola, me interesa ${props.product.name}${props.product.brand ? ` de ${props.product.brand}` : ''}. ${site.url}/producto/${props.product.slug}`,
-  ),
-)
+const whatsappHref = computed(() => {
+  const { name, brand, slug } = props.product
+  const tone = props.shade ? ` en tono ${props.shade.name}` : ''
+  return whatsappLink(
+    `Hola, me interesa ${name}${brand ? ` de ${brand}` : ''}${tone}. ${site.url}/producto/${slug}`,
+  )
+})
+
+function focusPicker() {
+  document.getElementById('tonos')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
 
 function add() {
-  addToBag(props.product, quantity.value)
+  if (needsShade.value) return focusPicker()
+  addToBag(props.product, quantity.value, true, props.shade)
 }
 
 function buyNow() {
+  if (needsShade.value) return focusPicker()
   // Si ya estaba en la bolsa no se duplica: se va directo a pagar.
-  if (!inCart(props.product._id)) addToBag(props.product, quantity.value, false)
-  if (inCart(props.product._id)) router.push('/checkout')
+  const id = props.shade?._id
+  if (!inCart(props.product._id, id)) addToBag(props.product, quantity.value, false, props.shade)
+  if (inCart(props.product._id, id)) router.push('/checkout')
 }
 </script>
 
@@ -54,7 +69,7 @@ function buyNow() {
 
     <p
       class="buy__stock"
-      :class="{ 'buy__stock--low': product.stock > 0 && product.stock <= 3, 'buy__stock--out': soldOut }"
+      :class="{ 'buy__stock--low': !needsShade && stock > 0 && stock <= 3, 'buy__stock--out': soldOut }"
     >
       <i
         :class="soldOut ? 'fa-solid fa-circle-xmark' : 'fa-solid fa-circle'"
@@ -63,10 +78,13 @@ function buyNow() {
       {{ stockLabel }}
     </p>
 
+    <ProductShadePicker v-if="hasShades" v-model="shadeId" :shades="product.shades" />
+
     <div v-if="!soldOut" class="buy__row">
       <QuantityStepper v-model="quantity" :max="max" />
       <button type="button" class="btn btn--primary buy__add" @click="add">
-        <i class="fa-solid fa-bag-shopping"></i> Agregar al carrito
+        <template v-if="needsShade">{{ site.shades.choose }}</template>
+        <template v-else><i class="fa-solid fa-bag-shopping"></i> Agregar al carrito</template>
       </button>
     </div>
     <button v-if="!soldOut" type="button" class="btn btn--dark buy__full" @click="buyNow">

@@ -17,8 +17,7 @@ export const site = {
   whatsapp: '593992815281',
   whatsappDisplay: '099 281 5281',
   whatsappCatalog: 'https://wa.me/c/593992815281',
-  canvaCatalog:
-    'https://www.canva.com/design/DAGnW_DQIiM/Xx_MQdj4zM1X-yHbXwAg0A/view',
+  canvaCatalog: 'https://www.canva.com/design/DAGnW_DQIiM/Xx_MQdj4zM1X-yHbXwAg0A/view',
   address: {
     street: 'Junín entre Rocafuerte y Bolívar',
     reference: 'Diagonal a la Prefectura',
@@ -45,16 +44,40 @@ export const site = {
     secondaryCta: 'Escríbenos por WhatsApp',
   },
   perks: [
-    { icon: 'fa-solid fa-certificate', title: '100% original', text: 'Productos auténticos traídos de USA.' },
-    { icon: 'fa-solid fa-truck-fast', title: 'Envíos a todo Ecuador', text: 'Entrega en Machala y envíos nacionales.' },
-    { icon: 'fa-solid fa-lock', title: 'Pago seguro', text: 'Paga con tarjeta a través de Payphone.' },
-    { icon: 'fa-brands fa-whatsapp', title: 'Te asesoramos', text: 'Escríbenos y te ayudamos a elegir.' },
+    {
+      icon: 'fa-solid fa-certificate',
+      title: '100% original',
+      text: 'Productos auténticos traídos de USA.',
+    },
+    {
+      icon: 'fa-solid fa-truck-fast',
+      title: 'Envíos a todo Ecuador',
+      text: 'Entrega en Machala y envíos nacionales.',
+    },
+    {
+      icon: 'fa-solid fa-lock',
+      title: 'Pago seguro',
+      text: 'Paga con tarjeta a través de Payphone.',
+    },
+    {
+      icon: 'fa-brands fa-whatsapp',
+      title: 'Te asesoramos',
+      text: 'Escríbenos y te ayudamos a elegir.',
+    },
   ],
   about: {
     eyebrow: 'Nuestra tienda',
     title: 'Visítanos en Machala',
     text: 'Somos una tienda de maquillaje y skincare original en el centro de Machala. Ven a probar tus productos favoritos o pide por la web y te lo enviamos.',
     hours: 'Lunes a sábado',
+  },
+  shades: {
+    label: 'Tono',
+    choose: 'Elige tu tono',
+    chooseFirst: 'Elige un tono antes de agregarlo',
+    cardCta: 'Elegir tono',
+    count: (n: number) => (n === 1 ? '1 tono' : `${n} tonos`),
+    soldOut: 'agotado',
   },
   whatsappGreeting: 'Hola, vengo de la web de Ivonne Beauty Shop',
   legal: {

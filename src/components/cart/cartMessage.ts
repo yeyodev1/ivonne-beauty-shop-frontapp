@@ -6,7 +6,7 @@ import type { CartItem } from '@/types'
 export function cartWhatsappMessage(items: CartItem[], subtotal: number): string {
   const lines = items.map(
     (item) =>
-      `• ${item.quantity} x ${item.name}${item.brand ? ` (${item.brand})` : ''} — ${formatMoney(item.price * item.quantity)}`,
+      `• ${item.quantity} x ${item.name}${item.brand ? ` (${item.brand})` : ''}${item.shadeName ? ` · Tono ${item.shadeName}` : ''} — ${formatMoney(item.price * item.quantity)}`,
   )
   return [
     'Hola, quiero hacer este pedido:',

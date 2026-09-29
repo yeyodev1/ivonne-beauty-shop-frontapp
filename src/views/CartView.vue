@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useCartStore } from '@/stores/cart'
+import { itemKey, useCartStore } from '@/stores/cart'
 import CartLine from '@/components/cart/CartLine.vue'
 import CartSummary from '@/components/cart/CartSummary.vue'
 import CartEmpty from '@/components/cart/CartEmpty.vue'
@@ -22,7 +22,7 @@ const countLabel = computed(() => (cart.count === 1 ? '1 producto' : `${cart.cou
     <div v-else class="cart__body">
       <section class="cart__lines" aria-label="Productos en tu bolsa">
         <ul>
-          <CartLine v-for="item in cart.items" :key="item.productId" :item="item" />
+          <CartLine v-for="item in cart.items" :key="itemKey(item)" :item="item" />
         </ul>
         <div class="cart__more">
           <RouterLink to="/tienda" class="cart__continue">

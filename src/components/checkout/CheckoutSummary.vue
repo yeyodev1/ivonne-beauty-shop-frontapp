@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useCartStore } from '@/stores/cart'
+import { itemKey, useCartStore } from '@/stores/cart'
 import { useCheckout } from '@/composables/useCheckout'
 import { formatMoney } from '@/utils/format'
 import CheckoutStep from './CheckoutStep.vue'
@@ -28,7 +28,7 @@ const open = ref(false)
     </template>
 
     <ul id="summary-lines" class="summary__lines" :class="{ 'summary__lines--open': open }">
-      <li v-for="item in cart.items" :key="item.productId" class="summary__line">
+      <li v-for="item in cart.items" :key="itemKey(item)" class="summary__line">
         <div class="summary__thumb">
           <img :src="item.image || '/placeholder-product.svg'" :alt="item.name" loading="lazy" />
           <span class="summary__qty" :aria-label="`Cantidad ${item.quantity}`">{{ item.quantity }}</span>
@@ -36,6 +36,7 @@ const open = ref(false)
         <div class="summary__info">
           <small v-if="item.brand">{{ item.brand }}</small>
           <p>{{ item.name }}</p>
+          <small v-if="item.shadeName" class="summary__shade">Tono: {{ item.shadeName }}</small>
         </div>
         <strong class="summary__price">{{ formatMoney(item.price * item.quantity) }}</strong>
       </li>
@@ -152,6 +153,11 @@ const open = ref(false)
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
+    }
+
+    .summary__shade {
+      text-transform: none;
+      letter-spacing: 0;
     }
   }
 

@@ -40,6 +40,17 @@ export interface ProductImage {
   publicId: string
 }
 
+export interface ProductShade {
+  // Sin _id mientras el admin no guarda un tono recién agregado
+  _id?: string
+  name: string
+  // Hex (#c68b6e) para la muestra; '' si no se definió
+  color: string
+  stock: number
+  // false = bloqueado a mano aunque quede stock
+  isActive: boolean
+}
+
 export interface Product {
   _id: string
   name: string
@@ -50,6 +61,8 @@ export interface Product {
   price: number
   compareAtPrice: number | null
   images: ProductImage[]
+  shades: ProductShade[]
+  // Con tonos, es la suma del stock de los tonos activos
   stock: number
   isPublished: boolean
   isFeatured: boolean
@@ -89,6 +102,7 @@ export interface OrderItem {
   image: string
   price: number
   quantity: number
+  shade?: { id: string; name: string; color: string } | null
 }
 
 export type OrderStatus = 'pending' | 'paid' | 'preparing' | 'shipped' | 'delivered' | 'canceled'
@@ -127,7 +141,7 @@ export interface Order {
 }
 
 export interface CreateOrderPayload {
-  items: Array<{ productId: string; quantity: number }>
+  items: Array<{ productId: string; shadeId?: string; quantity: number }>
   customer: OrderCustomer
   shippingOptionId: string
   address: OrderAddress
@@ -183,6 +197,10 @@ export interface AdminUser {
 /** Línea del carrito: copia mínima del producto para pintar sin pedir al API. */
 export interface CartItem {
   productId: string
+  // '' en productos sin tonos (y en carritos guardados antes de que existieran)
+  shadeId?: string
+  shadeName?: string
+  shadeColor?: string
   slug: string
   name: string
   brand: string

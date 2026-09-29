@@ -8,7 +8,7 @@ import ProductDetails from '@/components/product/ProductDetails.vue'
 import ProductRail from '@/components/product/ProductRail.vue'
 import ProductStickyBar from '@/components/product/ProductStickyBar.vue'
 
-const { product, related, loading, notFound, category, discount } = useProductDetail()
+const { product, related, loading, notFound, category, discount, shadeId, shade } = useProductDetail()
 const { settings } = useSettings()
 
 const badge = computed(() => {
@@ -64,7 +64,7 @@ const badge = computed(() => {
             {{ product.brand }}
           </RouterLink>
           <h1 class="pdp__name">{{ product.name }}</h1>
-          <ProductBuyBox :product="product" :discount="discount" />
+          <ProductBuyBox v-model:shade-id="shadeId" :product="product" :discount="discount" :shade="shade" />
           <ProductDetails :description="product.description" :shipping="settings.shippingOptions" />
         </div>
       </div>
@@ -75,7 +75,7 @@ const badge = computed(() => {
         <ProductRail :products="related" label="Productos relacionados" />
       </section>
 
-      <ProductStickyBar :product="product" />
+      <ProductStickyBar :product="product" :shade="shade" />
     </template>
   </div>
 </template>

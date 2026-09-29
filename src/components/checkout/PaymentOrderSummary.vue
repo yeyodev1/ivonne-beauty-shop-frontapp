@@ -40,10 +40,11 @@ const nextStep = computed(() => {
     </div>
 
     <ul class="receipt__lines">
-      <li v-for="item in order.items" :key="item.product" class="receipt__line">
+      <li v-for="(item, i) in order.items" :key="i" class="receipt__line">
         <img :src="item.image || '/placeholder-product.svg'" :alt="item.name" loading="lazy" />
         <p>
           <span>{{ item.name }}</span>
+          <small v-if="item.shade">Tono: {{ item.shade.name }}</small>
           <small>{{ item.quantity }} x {{ formatMoney(item.price) }}</small>
         </p>
         <strong>{{ formatMoney(item.price * item.quantity) }}</strong>

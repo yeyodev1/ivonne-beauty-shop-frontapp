@@ -32,7 +32,7 @@ const isPickup = computed(() => props.order.shipping.optionId === 'pickup')
         <strong>{{ formatMoney(order.total) }}</strong>
       </div>
       <div class="order__thumbs">
-        <img v-for="item in thumbs" :key="item.product" :src="item.image || '/placeholder-product.svg'" :alt="item.name" loading="lazy" />
+        <img v-for="(item, i) in thumbs" :key="i" :src="item.image || '/placeholder-product.svg'" :alt="item.name" loading="lazy" />
         <span v-if="extra" class="order__extra">+{{ extra }}</span>
         <i class="fa-solid fa-chevron-down order__chevron" aria-hidden="true"></i>
       </div>
@@ -40,8 +40,10 @@ const isPickup = computed(() => props.order.shipping.optionId === 'pickup')
 
     <div v-show="open" :id="`order-${order._id}`" class="order__body">
       <ul class="order__lines">
-        <li v-for="item in order.items" :key="item.product">
-          <RouterLink :to="`/producto/${item.slug}`">{{ item.name }}</RouterLink>
+        <li v-for="(item, i) in order.items" :key="i">
+          <RouterLink :to="`/producto/${item.slug}`">
+            {{ item.name }}<template v-if="item.shade"> · Tono {{ item.shade.name }}</template>
+          </RouterLink>
           <span>{{ item.quantity }} x {{ formatMoney(item.price) }}</span>
         </li>
       </ul>

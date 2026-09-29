@@ -9,11 +9,15 @@ defineProps<{ order: Order }>()
   <section class="oitems">
     <h2 class="oitems__title">Productos</h2>
     <ul class="oitems__list">
-      <li v-for="item in order.items" :key="`${item.product}-${item.name}`" class="oitems__line">
+      <li v-for="(item, i) in order.items" :key="i" class="oitems__line">
         <img :src="item.image || '/placeholder-product.svg'" :alt="item.name" loading="lazy" />
         <div class="oitems__info">
           <p class="oitems__brand">{{ item.brand }}</p>
           <p class="oitems__name">{{ item.name }}</p>
+          <p v-if="item.shade" class="oitems__shade">
+            <span v-if="item.shade.color" class="oitems__dot" :style="{ backgroundColor: item.shade.color }" aria-hidden="true"></span>
+            Tono: <strong>{{ item.shade.name }}</strong>
+          </p>
           <p class="oitems__qty">{{ item.quantity }} × {{ formatMoney(item.price) }}</p>
         </div>
         <strong class="oitems__sum">{{ formatMoney(item.price * item.quantity) }}</strong>
@@ -76,6 +80,25 @@ defineProps<{ order: Order }>()
     font-size: 0.86rem;
     font-weight: 600;
     line-height: 1.3;
+  }
+
+  // Ivonne arma el pedido con esto: el tono tiene que saltar a la vista
+  &__shade {
+    @include flex(row, center, flex-start, 0.35rem);
+    font-size: $text-xs;
+    color: $ink-soft;
+    margin-block: 0.1rem;
+
+    strong {
+      color: $ink;
+    }
+  }
+
+  &__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba($ink, 0.15);
   }
 
   &__qty {

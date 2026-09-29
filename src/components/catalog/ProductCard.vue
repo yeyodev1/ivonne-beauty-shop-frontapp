@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { site } from '@/config/site'
 import { formatMoney, productCover } from '@/utils/format'
 import { useProductCart } from '@/composables/useProductCart'
 import type { Product } from '@/types'
@@ -15,6 +16,11 @@ const discount = computed(() => {
   return Math.round((1 - price / compareAtPrice) * 100)
 })
 const link = computed(() => `/producto/${props.product.slug}`)
+
+const MAX_DOTS = 5
+const shades = computed(() => props.product.shades || [])
+const hasShades = computed(() => shades.value.length > 0)
+const dots = computed(() => shades.value.filter((s) => s.color).slice(0, MAX_DOTS))
 </script>
 
 <template>
@@ -33,12 +39,33 @@ const link = computed(() => `/producto/${props.product.slug}`)
     <div class="card__body">
       <p v-if="product.brand" class="card__brand">{{ product.brand }}</p>
       <RouterLink :to="link" class="card__name">{{ product.name }}</RouterLink>
+      <p v-if="hasShades" class="card__shades">
+        <span
+          v-for="shade in dots"
+          :key="shade._id"
+          class="card__dot"
+          :style="{ backgroundColor: shade.color }"
+          aria-hidden="true"
+        ></span>
+        {{ site.shades.count(shades.length) }}
+      </p>
       <div class="card__foot">
         <p class="card__price">
           <span class="card__now">{{ formatMoney(product.price) }}</span>
           <s v-if="discount" class="card__before">{{ formatMoney(product.compareAtPrice || 0) }}</s>
         </p>
+        <!-- Con tonos no se agrega desde la tarjeta: hay que elegir el tono en la ficha -->
+        <RouterLink
+          v-if="hasShades && !soldOut"
+          :to="link"
+          class="card__add"
+          :aria-label="`${site.shades.cardCta} de ${product.name}`"
+        >
+          <i class="fa-solid fa-palette"></i>
+          <span class="card__add-label">{{ site.shades.cardCta }}</span>
+        </RouterLink>
         <button
+          v-else
           type="button"
           class="card__add"
           :disabled="soldOut"
@@ -145,6 +172,23 @@ const link = computed(() => `/producto/${props.product.slug}`)
 
     &:hover {
       color: $accent-deep;
+    }
+  }
+
+  &__shades {
+    @include flex(row, center, flex-start, 0.2rem);
+    font-size: 0.7rem;
+    color: $ink-muted;
+  }
+
+  &__dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba($ink, 0.12);
+
+    &:last-of-type {
+      margin-right: 0.25rem;
     }
   }
 

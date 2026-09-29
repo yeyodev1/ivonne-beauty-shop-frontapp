@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useCartStore } from '@/stores/cart'
+import { itemKey, useCartStore } from '@/stores/cart'
 import { formatMoney } from '@/utils/format'
 import QuantityStepper from './QuantityStepper.vue'
 import type { CartItem } from '@/types'
@@ -12,10 +12,12 @@ const cart = useCartStore()
 
 const quantity = computed({
   get: () => props.item.quantity,
-  set: (value: number) => cart.setQuantity(props.item.productId, value),
+  set: (value: number) => cart.setQuantity(itemKey(props.item), value),
 })
 const max = computed(() => Math.max(1, Math.min(props.item.stock, 20)))
-const link = computed(() => `/producto/${props.item.slug}`)
+const link = computed(
+  () => `/producto/${props.item.slug}${props.item.shadeId ? `?tono=${props.item.shadeId}` : ''}`,
+)
 </script>
 
 <template>
@@ -26,6 +28,10 @@ const link = computed(() => `/producto/${props.item.slug}`)
     <div class="line__info">
       <p v-if="item.brand" class="line__brand">{{ item.brand }}</p>
       <RouterLink :to="link" class="line__name" @click="emit('navigate')">{{ item.name }}</RouterLink>
+      <p v-if="item.shadeName" class="line__shade">
+        <span v-if="item.shadeColor" class="line__dot" :style="{ backgroundColor: item.shadeColor }" aria-hidden="true"></span>
+        Tono: {{ item.shadeName }}
+      </p>
       <p class="line__unit">{{ formatMoney(item.price) }} c/u</p>
       <div class="line__row">
         <QuantityStepper v-model="quantity" :max="max" size="sm" :label="`Cantidad de ${item.name}`" />
@@ -37,7 +43,7 @@ const link = computed(() => `/producto/${props.item.slug}`)
       type="button"
       class="line__remove"
       :aria-label="`Quitar ${item.name} de la bolsa`"
-      @click="cart.remove(item.productId)"
+      @click="cart.remove(itemKey(item))"
     >
       <i class="fa-regular fa-trash-can"></i>
     </button>
@@ -90,6 +96,19 @@ const link = computed(() => `/producto/${props.item.slug}`)
     &:hover {
       color: $accent-deep;
     }
+  }
+
+  &__shade {
+    @include flex(row, center, flex-start, 0.35rem);
+    font-size: $text-xs;
+    color: $ink-soft;
+  }
+
+  &__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba($ink, 0.12);
   }
 
   &__unit {
